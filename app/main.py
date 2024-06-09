@@ -9,19 +9,19 @@ def main(HOST,PORT):
     # Uncomment this to pass the first stage
     #
     #server_socket = socket.create_server(("localhost", 6379), reuse_port=True)
-    #connection, address = server_socket.accept()
-    with socket.create_connection((HOST,PORT)) as conn:
-        data = conn.recv(1024).decode()
-        print("data is ", data)
-        response = ""
-        try:
-            result = data.split("\r\n")
-            if "PING" in result:
-                response = f"+PONG\r\n"
-        except Exception as e:
-            response = None
-
-        conn.sendall(response.encode())
+    #
+    with socket.create_server((HOST,PORT),reuse_port=True) as server_socket:
+        conn, address = server_socket.accept()
+        #data = conn.recv(1024).decode()
+        # print("data is ", data)
+        response = b"+PONG\r\n"
+        # try:
+        #     result = data.split("\r\n")
+        #     if "PING" in result:
+                
+        # except Exception as e:
+        #     response = None
+        conn.sendall(response)
         conn.close()
 
 
