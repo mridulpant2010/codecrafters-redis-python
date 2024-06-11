@@ -1,6 +1,7 @@
 import socket
 import threading
 
+
 def handle_connection(conn):
     while True:
         data = conn.recv(1024).decode()
@@ -11,12 +12,13 @@ def handle_connection(conn):
             conn.sendall(response)
     conn.close()
 
+
 def main():
     print("Logs from your program will appear here!")
-    with socket.create_server((HOST,PORT),reuse_port=True) as server_socket:
+    with socket.create_server((HOST, PORT), reuse_port=True) as server_socket:
         while True:
-            conn, _ =server_socket.accept()
-            thread= threading.Thread(target=handle_connection , args=(conn,))
+            conn, _ = server_socket.accept()
+            thread = threading.Thread(target=handle_connection, args=(conn,))
             thread.start()
 
 
@@ -26,7 +28,7 @@ if __name__ == "__main__":
     main()
 
 
-#one conn and we have multiple request from a single client.
+# one conn and we have multiple request from a single client.
 
 # with socket.create_server((HOST,PORT),reuse_port=True) as server:
 #     conn,add = server.accept()
@@ -38,5 +40,5 @@ if __name__ == "__main__":
 #         response = b"+PONG\r\n"
 #         conn.sendall(response)
 #     conn.close()
-    
-#multiple connection and multiple requests from multiple clients.
+
+# multiple connection and multiple requests from multiple clients.
