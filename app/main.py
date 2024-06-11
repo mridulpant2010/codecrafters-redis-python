@@ -12,16 +12,17 @@ def main(HOST,PORT):
     #
     with socket.create_server((HOST,PORT),reuse_port=True) as server_socket:
         conn, address = server_socket.accept()
-        #data = conn.recv(1024).decode()
-        # print("data is ", data)
-        response = b"+PONG\r\n"
-        # try:
-        #     result = data.split("\r\n")
-        #     if "PING" in result:
-                
-        # except Exception as e:
-        #     response = None
-        conn.sendall(response)
+        while True:
+            data = conn.recv(1024).decode()
+            print("data is ", data)
+            response = b"+PONG\r\n"
+            #try:
+                # result = data.split("\n")
+                # for each_re in result:
+            if "PING" in data:
+                conn.sendall(response)
+            # except Exception as e:
+            #     response = None
         conn.close()
 
 
