@@ -1,6 +1,7 @@
 import socket
 import threading
-import argparse
+import time
+
 
 # what is asyncore library and how is it useful?
 
@@ -49,10 +50,22 @@ class Redis:
             return elements
 
 
+class Hash:
+    def __init__(self, expire=None):
+        self.expiry = expire
+        self.expire_factor = None
+        self.hash = {}
+
+    def set(self, key, value):
+        self.hash[key] = value
+
+    def get(self, key):
+        return self.hash[key]
+
+
 def handle_connection(conn):
     while True:
         data = conn.recv(1024).decode()
-
         if data == b"":
             break
         response_data = data.split(CRLF)
@@ -61,10 +74,19 @@ def handle_connection(conn):
                 response_data = response_data[-2]
                 response = f"+{response_data}{CRLF}".encode()
             elif "set" in data.lower():
-                hash[response_data[4]] = response_data[6]
+                hash.set(response_data[4], response_data[6])
+
+                if "px" in data.lower():
+                    hash.expiry = time.time()
+                    hash.expire_factor = int(response_data[10])
                 response = f"+OK{CRLF}".encode()
             elif "get" in data.lower():
-                ans = hash[response_data[4]]
+                ans = hash.get(response_data[4])
+                if (
+                    hash.expiry
+                    and (time.time() - hash.expiry) * 1000 > hash.expire_factor
+                ):
+                    raise KeyError
                 response = f"${len(ans)}{CRLF}{ans}{CRLF}".encode()
             else:
                 response = f"+PONG{CRLF}".encode()
@@ -88,6 +110,6 @@ if __name__ == "__main__":
     PORT = 6379
     CRLF = "\r\n"
 
-    hash = {}
+    hash = Hash()
 
     main()
