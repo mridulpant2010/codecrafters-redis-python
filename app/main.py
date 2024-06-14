@@ -1,10 +1,11 @@
 import socket
 import threading
 import time
+import argparse
 
 
 # what is asyncore library and how is it useful?
-
+#lot of folks have used async functions and mututal exclusion, is it really necessary?
 
 class RedisError(Exception):
     pass
@@ -107,9 +108,14 @@ def main():
 
 if __name__ == "__main__":
     HOST = "127.0.0.1"
-    PORT = 6379
+    #PORT = 6379
     CRLF = "\r\n"
+    parser = argparse.ArgumentParser(description="a command line example")
+    parser.add_argument("--port",dest="port",action="store",type=int,default=6379,help="port for the server to run")
+    args=parser.parse_args()
 
+    PORT=args.port
+    
     hash = Hash()
 
     main()
