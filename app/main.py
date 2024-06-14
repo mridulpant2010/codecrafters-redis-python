@@ -89,6 +89,9 @@ def handle_connection(conn):
                 ):
                     raise KeyError
                 response = f"${len(ans)}{CRLF}{ans}{CRLF}".encode()
+            elif "info" in data.lower():
+                server_type = "role:master"
+                response = f"${len(server_type)}{CRLF}{server_type}{CRLF}".encode()
             else:
                 response = f"+PONG{CRLF}".encode()
         except KeyError:
