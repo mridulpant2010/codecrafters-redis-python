@@ -91,8 +91,14 @@ def handle_connection(conn):
                     raise KeyError
                 response = f"${len(ans)}{CRLF}{ans}{CRLF}".encode()
             elif "info" in data.lower():
-                server_type = f"role:{REPLICAOF}"
-                response = f"${len(server_type)}{CRLF}{server_type}{CRLF}".encode()
+                server_type = f"role:{REPLICAOF}\n"
+                replication_id = (
+                    "master_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\n"
+                )
+                replication_offset = "master_repl_offset:0\n"
+                response = server_type + replication_id + replication_offset
+                response = f"${len(response)}{CRLF}{response}{CRLF}".encode()
+                # {replication_id}{CRLF}{replication_offset}{CRLF}".encode()
             else:
                 response = f"+PONG{CRLF}".encode()
         except KeyError:
