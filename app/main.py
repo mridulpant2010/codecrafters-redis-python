@@ -5,7 +5,8 @@ import argparse
 
 
 # what is asyncore library and how is it useful?
-#lot of folks have used async functions and mututal exclusion, is it really necessary?
+# lot of folks have used async functions and mututal exclusion, is it really necessary?
+
 
 class RedisError(Exception):
     pass
@@ -90,7 +91,7 @@ def handle_connection(conn):
                     raise KeyError
                 response = f"${len(ans)}{CRLF}{ans}{CRLF}".encode()
             elif "info" in data.lower():
-                server_type = "role:master"
+                server_type = f"role:{REPLICAOF}"
                 response = f"${len(server_type)}{CRLF}{server_type}{CRLF}".encode()
             else:
                 response = f"+PONG{CRLF}".encode()
@@ -111,14 +112,29 @@ def main():
 
 if __name__ == "__main__":
     HOST = "127.0.0.1"
-    #PORT = 6379
+    # PORT = 6379
     CRLF = "\r\n"
     parser = argparse.ArgumentParser(description="a command line example")
-    parser.add_argument("--port",dest="port",action="store",type=int,default=6379,help="port for the server to run")
-    args=parser.parse_args()
+    parser.add_argument(
+        "--port",
+        dest="port",
+        action="store",
+        type=int,
+        default=6379,
+        help="port for the server to run",
+    )
+    parser.add_argument(
+        "--replicaof",
+        dest="replicaof",
+        action="store",
+        type=str,
+        help="provides host and port of the master redis server",
+    )
+    args = parser.parse_args()
 
-    PORT=args.port
-    
+    PORT = args.port
+    REPLICAOF = "slave" if args.replicaof else "master"
+
     hash = Hash()
 
     main()
