@@ -107,7 +107,20 @@ def handle_connection(conn):
     conn.close()
 
 
+def connect_to_master_server():
+    try:
+        if args.replicaof:
+            host, port = args.replicaof.split(" ")
+            soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # understand this
+            soc.connect((host, int(port)))
+            response = b"*1\r\n$4\r\nPING\r\n"
+            soc.sendall(response)
+    except socket.error as err:
+        print(f"Socket creation failed with error: {err}")
+
+
 def main():
+
     print("Logs from your program will appear here!")
     with socket.create_server((HOST, PORT), reuse_port=True) as server_socket:
         while True:
@@ -118,7 +131,6 @@ def main():
 
 if __name__ == "__main__":
     HOST = "127.0.0.1"
-    # PORT = 6379
     CRLF = "\r\n"
     parser = argparse.ArgumentParser(description="a command line example")
     parser.add_argument(
@@ -142,5 +154,5 @@ if __name__ == "__main__":
     REPLICAOF = "slave" if args.replicaof else "master"
 
     hash = Hash()
-
+    connect_to_master_server()
     main()
