@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 import argparse
+from urllib import request
 
 
 # what is asyncore library and how is it useful?
@@ -107,14 +108,24 @@ def handle_connection(conn):
     conn.close()
 
 
+def send_request(soc, request):
+    soc.sendall(request)
+    soc.recv(1024).decode()
+
+
 def connect_to_master_server():
     try:
         if args.replicaof:
             host, port = args.replicaof.split(" ")
             soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # understand this
             soc.connect((host, int(port)))
-            response = b"*1\r\n$4\r\nPING\r\n"
-            soc.sendall(response)
+            request = f"*1{CRLF}$4{CRLF}PING{CRLF}".encode()
+            send_request(soc, request)
+            # REPLCONF
+            request = f"*3{CRLF}$8{CRLF}REPLCONF{CRLF}$14{CRLF}listening-port{CRLF}$4{CRLF}{PORT}{CRLF}".encode()
+            send_request(soc, request)
+            request = f"*3{CRLF}$8{CRLF}REPLCONF{CRLF}$4{CRLF}capa{CRLF}$6{CRLF}psync2{CRLF}".encode()
+            send_request(soc, request)
     except socket.error as err:
         print(f"Socket creation failed with error: {err}")
 
