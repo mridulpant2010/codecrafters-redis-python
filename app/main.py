@@ -126,6 +126,11 @@ def connect_to_master_server():
             send_request(soc, request)
             request = f"*3{CRLF}$8{CRLF}REPLCONF{CRLF}$4{CRLF}capa{CRLF}$6{CRLF}psync2{CRLF}".encode()
             send_request(soc, request)
+
+            request = (
+                f"*3{CRLF}$5{CRLF}PSYNC{CRLF}$1{CRLF}?{CRLF}$2{CRLF}-1{CRLF}".encode()
+            )
+            send_request(soc, request)
     except socket.error as err:
         print(f"Socket creation failed with error: {err}")
 
