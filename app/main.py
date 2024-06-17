@@ -100,6 +100,8 @@ def handle_connection(conn):
                 response = server_type + replication_id + replication_offset
                 response = f"${len(response)}{CRLF}{response}{CRLF}".encode()
                 # {replication_id}{CRLF}{replication_offset}{CRLF}".encode()
+            elif "replconf" in data.lower():
+                response = f"+OK{CRLF}".encode()
             else:
                 response = f"+PONG{CRLF}".encode()
         except KeyError:
