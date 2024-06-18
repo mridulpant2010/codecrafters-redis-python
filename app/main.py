@@ -93,15 +93,15 @@ def handle_connection(conn):
                 response = f"${len(ans)}{CRLF}{ans}{CRLF}".encode()
             elif "info" in data.lower():
                 server_type = f"role:{REPLICAOF}\n"
-                replication_id = (
-                    "master_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\n"
-                )
-                replication_offset = "master_repl_offset:0\n"
+                replication_id = f"master_replid:{repl_id}\n"
+                replication_offset = f"master_repl_offset:{repl_offset}\n"
                 response = server_type + replication_id + replication_offset
                 response = f"${len(response)}{CRLF}{response}{CRLF}".encode()
                 # {replication_id}{CRLF}{replication_offset}{CRLF}".encode()
             elif "replconf" in data.lower():
                 response = f"+OK{CRLF}".encode()
+            elif "psync" in data.lower():
+                response = f"+FULLRESYNC {repl_id} {repl_offset}{CRLF}".encode()
             else:
                 response = f"+PONG{CRLF}".encode()
         except KeyError:
@@ -150,6 +150,10 @@ def main():
 if __name__ == "__main__":
     HOST = "127.0.0.1"
     CRLF = "\r\n"
+
+    repl_id = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
+    repl_offset = "0"
+
     parser = argparse.ArgumentParser(description="a command line example")
     parser.add_argument(
         "--port",
