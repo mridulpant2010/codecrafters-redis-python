@@ -101,12 +101,22 @@ def handle_connection(conn):
             elif "replconf" in data.lower():
                 response = f"+OK{CRLF}".encode()
             elif "psync" in data.lower():
-                response = f"+FULLRESYNC {repl_id} {repl_offset}{CRLF}".encode()
+                response = []
+                res = f"+FULLRESYNC {repl_id} {repl_offset}{CRLF}".encode()
+                response.append(res)
+
+                rdb_content = bytes.fromhex(rdb_hex)
+                rdb_data = f"${len(rdb_content)}{CRLF}".encode()
+                response.append(rdb_data + rdb_content)
             else:
                 response = f"+PONG{CRLF}".encode()
         except KeyError:
             response = f"$-1{CRLF}".encode()
-        conn.sendall(response)
+        if isinstance(response, list):
+            for each_re in response:
+                conn.sendall(each_re)
+        else:
+            conn.sendall(response)
     conn.close()
 
 
@@ -151,6 +161,7 @@ if __name__ == "__main__":
     HOST = "127.0.0.1"
     CRLF = "\r\n"
 
+    rdb_hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2"
     repl_id = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
     repl_offset = "0"
 
